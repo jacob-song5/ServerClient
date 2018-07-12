@@ -1,10 +1,13 @@
 import socket
+import os
+from pathlib import Path
 import pathFunctions
 
 def main():
     server = makeSocket()
     while True:
-        handleConnection(server)
+        currentPath = Path("E:\\Users\\Jake\\Pictures\\Bookmarks")
+        handleConnection(server, currentPath)
 
 def makeSocket():
     s = socket.socket()
@@ -16,12 +19,11 @@ def makeSocket():
     s.listen(5)
     return s
 
-def handleConnection(s):
+def handleConnection(s, currentPath: Path):
     c, addr = s.accept()
-                   
     print("Got connection from", addr)
-    requestedFile = c.recv(8192).decode()
-    validateRequest(requestedFile, c)
+    request = c.recv(8192).decode()
+    validateRequest(request, c, currentPath)
     
 def copyFile(c, fileName):
     f = open(fileName, 'rb')
@@ -33,10 +35,23 @@ def copyFile(c, fileName):
     f.close()
     print("Done Writing")
 
-def validateRequest(requestedFile: str, c):
-    if pathFunctions.validPath(requestedFile):
+def lsCommand(path: Path, c):
+    pathList = os.listdir(path)
+    for item in pathList:
+        c.send((item+'\n').encode())
+    c.send("!!!!".encode())
+    print("ls handled")
+
+def validateRequest(request: str, c, path: Path):
+    if pathFunctions.validPath(request):
         c.send("Transfering your file now".encode())
-        copyFile(c, requestedFile)
+        copyFile(c, request)
+
+    elif request == "ls":
+        c.send("ls incoming".encode())
+        lsCommand(path, c)
+        validateRequest(c.recv(8192).decode(), c, path)
+    
     else:
         c.send("Not a valid file".encode())
         print("Rejected a request")
