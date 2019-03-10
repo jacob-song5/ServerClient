@@ -6,7 +6,7 @@ import pathFunctions
 def main():
     server = makeSocket()
     while True:
-        currentPath = Path("E:\\Users\\Jake")
+        currentPath = Path("E:\\Users\\Jake\\Pictures\\Bookmarks")
         handleConnection(server, currentPath)
 
 def makeSocket():
@@ -43,27 +43,38 @@ def lsCommand(path: Path, c):
 
 def validateRequest(request: str, c, path: Path):
     if os.path.isfile(request):
-        c.send("Transfering your file now".encode())
+        c.send("tr now".encode())
         copyFile(c, request)
 
     elif os.path.isfile(pathFunctions.adjustPathString(str(path), request)):
-        c.send("Transfering your file now".encode())
+        c.send("tr now".encode())
         copyFile(c, pathFunctions.adjustPathString(str(path), request))
 
+    elif os.path.isdir(request):
+        c.send("Transfering your folder now".encode())
+        #blahblahblah
+
+    elif os.path.isdir(pathFunctions.adjustPathString(str(path), request)):
+        c.send("Transfering your folder now".encode())
+        #blahblahblah
+
     elif request == "ls":
-        c.send("ls incoming".encode())
+        print("ls handled")
+        c.send("ls inc".encode())
         lsCommand(path, c)
         validateRequest(c.recv(8192).decode(), c, path)
 
     elif request[0:2] == "cd":
+        print("cd handled")
         newPath = cdCommand(request, c, path)
         validateRequest(c.recv(8192).decode(), c, newPath)
     
     else:
-        c.send("Not a valid request".encode())
+        c.send("not val".encode())
         validateRequest(c.recv(8192).decode(), c, path)
 
     c.close()
+
 
 def cdCommand(request: str, connection, currentPath: Path) -> Path:
     requestedPath = request[3:]

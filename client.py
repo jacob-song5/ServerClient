@@ -2,7 +2,7 @@ import socket
 #public ip of server is 108.192.40.180
 
 def main():
-    connection = makeSocket("108.192.40.180")
+    connection = makeSocket("192.168.0.17")
     request = input("% ")
     connection.send(request.encode())
     validateRequest(connection.recv(8192).decode(), request, connection)
@@ -33,10 +33,10 @@ def copyFile(fileName: str, connection):
     print("Done Receiving")
 
 def validateRequest(response: str, wantedFile: str, connection):
-    if response == "Transfering your file now":
-        copyFile(adjustFileName(wantedFile), connection)
+    if response == "tr now":
+        copyFile(adjustFileName(wantedFile), connection)        
 
-    elif response == "ls incoming":
+    elif response == "ls inc":
         response = connection.recv(8192).decode()
         while response != "":
             checkResponse(response, connection)
