@@ -21,7 +21,6 @@ import java.net.Socket;
 
 public class ConnectionActivity extends AppCompatActivity {
     private Socket connection;
-    private final String host = getString(R.string.host_addr);
     private final File download_dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     private String current = "";
     public PrintWriter out;
@@ -66,7 +65,7 @@ public class ConnectionActivity extends AppCompatActivity {
             try
             {
                 connection = new Socket();
-                connection.connect(new InetSocketAddress(host, 9462), 3000);
+                connection.connect(new InetSocketAddress(getResources().getString(R.string.host_addr), 9462), 3000);
 
                 out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
                 in = new InputStreamReader(connection.getInputStream());
@@ -126,7 +125,7 @@ public class ConnectionActivity extends AppCompatActivity {
 
             try {
                 connection = new Socket();
-                connection.connect(new InetSocketAddress(host, 9462), 3000);
+                connection.connect(new InetSocketAddress(getResources().getString(R.string.host_addr), 9462), 3000);
 
                 out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
                 in = connection.getInputStream();

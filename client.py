@@ -1,4 +1,5 @@
 import socket
+from timeit import default_timer as timer
 #public ip of server is 108.192.40.180
 
 def main():
@@ -25,15 +26,18 @@ def adjustFileName(fn: str) -> str:
 def copyFile(fileName: str, connection):
     f = open(fileName, 'wb')
     n = 1
+    start = timer()
     while (n):
-        print("Receiving")
+        #print("Receiving")
         n = connection.recv(8192)
         f.write(n)
+    print(timer()-start)
     f.close()
     print("Done Receiving")
 
 def validateRequest(response: str, wantedFile: str, connection):
     if response == "tr now":
+        
         copyFile(adjustFileName(wantedFile), connection)        
 
     elif response == "ls inc":

@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     private class Async_cd extends AsyncTask<String, Void, String>
     {
         private Socket connection;
-        private final String host = getString(R.string.host_addr);
         private PrintWriter out;
         private InputStreamReader in;
 
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             try
             {
                 connection = new Socket();
-                connection.connect(new InetSocketAddress(host, 9462), 3000);
+                connection.connect(new InetSocketAddress(getResources().getString(R.string.host_addr), 9462), 3000);
 
                 out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
                 in = new InputStreamReader(connection.getInputStream());

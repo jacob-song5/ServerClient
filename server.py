@@ -22,7 +22,7 @@ def makeSocket():
 def handleConnection(s, currentPath: Path):
     c, addr = s.accept()
     print("Got connection from", addr)
-    request = c.recv(8192).decode()
+    request = c.recv(16384).decode()
     validateRequest(request, c, currentPath)
     
 def copyFile(c, fileName: str):
@@ -30,7 +30,7 @@ def copyFile(c, fileName: str):
     n = 1
     while (n):
         #print('Writing')
-        n = f.read(8192)
+        n = f.read(16384)
         c.send(n)
     f.close()
     print("Done Writing")
@@ -62,16 +62,16 @@ def validateRequest(request: str, c, path: Path):
         print("ls handled")
         c.send("ls inc".encode())
         lsCommand(path, c)
-        validateRequest(c.recv(8192).decode(), c, path)
+        validateRequest(c.recv(16384).decode(), c, path)
 
     elif request[0:2] == "cd":
         print("cd handled")
         newPath = cdCommand(request, c, path)
-        validateRequest(c.recv(8192).decode(), c, newPath)
+        validateRequest(c.recv(16384).decode(), c, newPath)
     
     else:
         c.send("not val".encode())
-        validateRequest(c.recv(8192).decode(), c, path)
+        validateRequest(c.recv(16384).decode(), c, path)
 
     c.close()
 
