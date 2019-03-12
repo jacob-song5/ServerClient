@@ -6,7 +6,7 @@ def main():
     connection = makeSocket("192.168.0.17")
     request = input("% ")
     connection.send(request.encode())
-    validateRequest(connection.recv(8192).decode(), request, connection)
+    validateRequest(connection.recv(16384).decode(), request, connection)
     connection.close()
 
 def makeSocket(ip: str):
@@ -29,7 +29,7 @@ def copyFile(fileName: str, connection):
     start = timer()
     while (n):
         #print("Receiving")
-        n = connection.recv(8192)
+        n = connection.recv(16384)
         f.write(n)
     print(timer()-start)
     f.close()
@@ -41,21 +41,21 @@ def validateRequest(response: str, wantedFile: str, connection):
         copyFile(adjustFileName(wantedFile), connection)        
 
     elif response == "ls inc":
-        response = connection.recv(8192).decode()
+        response = connection.recv(16384).decode()
         while response != "":
             checkResponse(response, connection)
-            response = connection.recv(8192).decode()
+            response = connection.recv(16384).decode()
 
     elif response == "path changed":
         request = input("% ")
         connection.send(request.encode())
-        validateRequest(connection.recv(8192).decode(), request, connection)
+        validateRequest(connection.recv(16384).decode(), request, connection)
 
     else:
         print("Invalid request")
         request = input("% ")
         connection.send(request.encode())
-        validateRequest(connection.recv(8192).decode(), request, connection)
+        validateRequest(connection.recv(16384).decode(), request, connection)
         
 
 def checkResponse(response: str, connection):
@@ -63,7 +63,7 @@ def checkResponse(response: str, connection):
         print(response[:-4])
         request = input("% ")
         connection.send(request.encode())
-        validateRequest(connection.recv(8192).decode(), request, connection)
+        validateRequest(connection.recv(16384).decode(), request, connection)
         
     else:
         print(response)
