@@ -50,6 +50,8 @@ public class ConnectionActivity extends AppCompatActivity {
     public void request(View view)
     {
         EditText e = findViewById(R.id.request_entry);
+        TextView t = findViewById(R.id.results);
+        t.setText("Copying...");
         new AsyncCopy().execute(e.getText().toString());
     }
 
@@ -78,7 +80,7 @@ public class ConnectionActivity extends AppCompatActivity {
                 }
                 out.print("ls");
                 out.flush();
-                for (int i = 0; i < 11; ++i)
+                for (int i = 0; i < 6; ++i)
                     in.read();
                 n = in.read(response, 0,250);
                 while (true)
@@ -144,7 +146,7 @@ public class ConnectionActivity extends AppCompatActivity {
                     r += (char)in.read();
                 if (r.equals("tr now"))
                 {
-                    result = "Valid";
+                    result = "Finished";
                     File f = new File(download_dir, args[0]);
                     OutputStream f_out = new FileOutputStream(f);
                     int n = in.read(response, 0, 512);

@@ -2,6 +2,7 @@ import socket
 import os
 from pathlib import Path
 import pathFunctions
+from timeit import default_timer as timer
 
 def main():
     server = makeSocket()
@@ -28,10 +29,11 @@ def handleConnection(s, currentPath: Path):
 def copyFile(c, fileName: str):
     f = open(fileName, 'rb')
     n = 1
+    start = timer()
     while (n):
-        #print('Writing')
         n = f.read(16384)
         c.send(n)
+    print(timer() - start)
     f.close()
     print("Done Writing")
 
@@ -70,7 +72,7 @@ def validateRequest(request: str, c, path: Path):
         validateRequest(c.recv(16384).decode(), c, newPath)
     
     else:
-        c.send("not val".encode())
+        c.send("notval".encode())
         validateRequest(c.recv(16384).decode(), c, path)
 
     c.close()
