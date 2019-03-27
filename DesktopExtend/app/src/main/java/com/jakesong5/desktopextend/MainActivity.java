@@ -43,8 +43,21 @@ public class MainActivity extends AppCompatActivity {
         TextView t = findViewById(R.id.current_dir);
         EditText e = findViewById(R.id.entry_field);
         String path = e.getText().toString();
-        if (path != "")
-            (new Async_cd()).execute(t.getText().toString(), path);
+        String cur = t.getText().toString();
+
+        if (improperPath(path))
+            (new Async_cd()).execute(cur, childPath(cur, path));
+
+        else if (path != "")
+            (new Async_cd()).execute(cur, path);
+    }
+
+    public void sendBackCd(View view)
+    {
+        TextView t = findViewById(R.id.current_dir);
+        String cur = t.getText().toString();
+        if (!isRoot(cur))
+            (new Async_cd()).execute(cur, parentPath(cur));
     }
 
     private class Async_cd extends AsyncTask<String, Void, String>
@@ -98,6 +111,28 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(result);
             TextView t = findViewById(R.id.current_dir);
             t.setText(result);
+            EditText e = findViewById(R.id.entry_field);
+            e.setText("");
         }
+    }
+
+    private boolean isRoot(String str)
+    {
+        return (str.indexOf('\\') == -1);
+    }
+
+    private String parentPath(String str)
+    {
+        return str.substring(0, str.lastIndexOf('\\'));
+    }
+
+    private String childPath(String parent, String str)
+    {
+        return parent + '\\' + str;
+    }
+
+    private boolean improperPath(String str)
+    {
+        return (str.indexOf('\\') == -1) && (str.indexOf(':') == -1);
     }
 }

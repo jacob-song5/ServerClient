@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Desktop Extend</string>
-    <string name="default_dir">E:/Users/Jake/Pictures/Bookmarks</string>
+    <string name="default_dir">E:\\Users\\Jake\\Pictures\\Bookmarks</string>
     <string name ="host_addr">192.168.0.17</string>
 </resources>

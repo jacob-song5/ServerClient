@@ -80,6 +80,8 @@ def validateRequest(request: str, c, path: Path):
 
 def cdCommand(request: str, connection, currentPath: Path) -> Path:
     requestedPath = request[3:]
+    print("Requested path", requestedPath)
+    print("Adjusted path", pathFunctions.adjustPathString(str(currentPath), requestedPath))
     
     if pathFunctions.validPath(requestedPath) and os.path.isdir(requestedPath):
         connection.send("path changed".encode())

@@ -12,7 +12,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/default_dir" />
+        android:text="@string/default_dir"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/entry_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Entry"
+        android:inputType="textPersonName" />
 
     <Button
         android:id="@+id/cd_button"
@@ -34,12 +43,14 @@
         android:onClick="sendLs"
         android:text="List" />
 
-    <EditText
-        android:id="@+id/entry_field"
+    <Button
+        android:id="@+id/back_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Entry"
-        android:inputType="textPersonName" />
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:onClick="sendBackCd"
+        android:text="Back a Directory" />
 
 </LinearLayout>
