@@ -1,5 +1,4 @@
 import socket
-#public ip of server is 108.192.40.180
 
 def main():
     connection = makeSocket("192.168.0.17")

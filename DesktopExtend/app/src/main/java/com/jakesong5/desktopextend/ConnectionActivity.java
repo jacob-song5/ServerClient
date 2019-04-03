@@ -56,6 +56,15 @@ public class ConnectionActivity extends AppCompatActivity {
         new AsyncCopy().execute(e.getText().toString());
     }
 
+    private static String get_file_name(String str)
+    {
+        int i = str.lastIndexOf('\\');
+        if (i == -1)
+            return str;
+        else
+            return str.substring(i+1);
+    }
+
     private class AsyncLs extends AsyncTask<String, Void, String>
     {
         private Socket connection;
@@ -155,7 +164,7 @@ public class ConnectionActivity extends AppCompatActivity {
                 if (r.equals("tr now"))
                 {
                     result = "Finished";
-                    File f = new File(download_dir, args[0]);
+                    File f = new File(download_dir, get_file_name(args[0]));
                     OutputStream f_out = new FileOutputStream(f);
                     int n = in.read(response, 0, 512);
 

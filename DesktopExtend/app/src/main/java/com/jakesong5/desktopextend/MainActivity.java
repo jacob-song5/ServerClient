@@ -65,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
         String path = e.getText().toString();
         String cur = t.getText().toString();
 
-        if (improperPath(path))
-            (new Async_cd()).execute(cur, childPath(cur, path));
-
-        else if (path != "")
-            (new Async_cd()).execute(cur, path);
+        if (!path.equals(""))
+            if (improperPath(path))
+                (new Async_cd()).execute(cur, childPath(cur, path));
+            else
+                (new Async_cd()).execute(cur, path);
     }
 
     public void sendBackCd(View view)
@@ -136,22 +136,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isRoot(String str)
+    private static boolean isRoot(String str)
     {
         return (str.indexOf('\\') == -1);
     }
 
-    private String parentPath(String str)
+    private static String parentPath(String str)
     {
         return str.substring(0, str.lastIndexOf('\\'));
     }
 
-    private String childPath(String parent, String str)
+    private static String childPath(String parent, String str)
     {
         return parent + '\\' + str;
     }
 
-    private boolean improperPath(String str)
+    private static boolean improperPath(String str)
     {
         return (str.indexOf('\\') == -1) && (str.indexOf(':') == -1);
     }

@@ -14,7 +14,6 @@ def makeSocket():
     s = socket.socket()
     host = socket.gethostbyname(socket.gethostname())
     print(host)
-    #public ip of server is 108.192.40.180
     port = 9462
     s.bind((host, port))
     s.listen(5)
