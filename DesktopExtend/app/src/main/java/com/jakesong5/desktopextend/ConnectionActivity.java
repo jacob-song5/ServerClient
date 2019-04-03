@@ -20,11 +20,9 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class ConnectionActivity extends AppCompatActivity {
-    private Socket connection;
+    private String host_addr;
     private final File download_dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     private String current = "";
-    public PrintWriter out;
-    public InputStreamReader in;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +32,11 @@ public class ConnectionActivity extends AppCompatActivity {
         TextView t = this.findViewById(R.id.results);
         t.setMovementMethod(new ScrollingMovementMethod());
         Bundle extras = getIntent().getExtras();
-        if (extras != null)
+        if (extras != null) {
             current = extras.getString("dir");
+            host_addr = extras.getString("host_addr");
+            t.setText(host_addr);
+        }
 
         try
         {
@@ -57,6 +58,10 @@ public class ConnectionActivity extends AppCompatActivity {
 
     private class AsyncLs extends AsyncTask<String, Void, String>
     {
+        private Socket connection;
+        private PrintWriter out;
+        private InputStreamReader in;
+
         @Override
         protected String doInBackground(String... args)
         {
@@ -67,7 +72,7 @@ public class ConnectionActivity extends AppCompatActivity {
             try
             {
                 connection = new Socket();
-                connection.connect(new InetSocketAddress(getResources().getString(R.string.host_addr), 9462), 3000);
+                connection.connect(new InetSocketAddress(host_addr, 9462), 3000);
 
                 out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
                 in = new InputStreamReader(connection.getInputStream());
@@ -87,7 +92,7 @@ public class ConnectionActivity extends AppCompatActivity {
                 {
                     if (response[n-1] == '!' && response[n-2] == '!' && response[n-3] == '!' && response[n-4] == '!')
                     {
-                        msg += new String(response, 0, n-4);
+                        msg += new String(response, 0, n-5);
                         break;
                     }
                     else
@@ -118,6 +123,9 @@ public class ConnectionActivity extends AppCompatActivity {
 
     private class AsyncCopy extends AsyncTask<String, Void, String>
     {
+        private Socket connection;
+        private PrintWriter out;
+
         @Override
         protected String doInBackground(String... args)
         {
@@ -127,7 +135,7 @@ public class ConnectionActivity extends AppCompatActivity {
 
             try {
                 connection = new Socket();
-                connection.connect(new InetSocketAddress(getResources().getString(R.string.host_addr), 9462), 3000);
+                connection.connect(new InetSocketAddress(host_addr, 9462), 3000);
 
                 out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
                 in = connection.getInputStream();

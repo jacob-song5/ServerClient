@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -18,23 +19,42 @@ import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String host_addr;
+    private Bundle b = new Bundle();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         int REQUEST_CODE_ASK_PERMISSIONS = 123;
+        host_addr = "192.168.0.17";
+        b.putString("host_addr", host_addr);
 
         int hasWriteFilePermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (hasWriteFilePermission != PackageManager.PERMISSION_GRANTED)
             requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
     }
 
+    public void set_host_addr(View view)
+    {
+        EditText e = findViewById(R.id.host_addr_entry);
+        String r = e.getText().toString();
+        if (r.length() > 0) {
+            host_addr = r;
+            b.putString("host_addr", host_addr);
+        }
+
+        TextView t = findViewById(R.id.host_label);
+        t.setText("Address of Server: " + r);
+    }
+
     public void sendLs(View view)
     {
         Intent ls = new Intent(MainActivity.this, ConnectionActivity.class);
         TextView t = findViewById(R.id.current_dir);
-        ls.putExtra("dir", t.getText().toString());
+        b.putString("dir", t.getText().toString());
+        ls.putExtras(b);
         startActivity(ls);
     }
 
@@ -79,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             try
             {
                 connection = new Socket();
-                connection.connect(new InetSocketAddress(getResources().getString(R.string.host_addr), 9462), 3000);
+                connection.connect(new InetSocketAddress(host_addr, 9462), 3000);
 
                 out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
                 in = new InputStreamReader(connection.getInputStream());

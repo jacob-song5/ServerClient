@@ -61,7 +61,7 @@ def checkResponse(response: str, connection):
         validateRequest(connection.recv(16384).decode(), request, connection)
         
     else:
-        print(response)
+        print(response, end="")
 
 def containsDone(response: str) -> bool:
     return "!!!!" in response

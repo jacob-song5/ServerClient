@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">Desktop Extend</string>
     <string name="default_dir">E:\\Users\\Jake\\Pictures\\Bookmarks</string>
-    <string name ="host_addr">192.168.0.17</string>
+    <string name="change_dir">Change Directory</string>
+    <string name="list">List</string>
+    <string name="back_dir">Back a Directory</string>
+    <string name="entry">Entry</string>
+    <string name="ip_enter">Server Address</string>
+    <string name="default_host">192.168.0.17</string>
+    <string name="default_host_label">Address of Server: 192.168.0.17</string>
 </resources>
