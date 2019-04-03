@@ -18,10 +18,11 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Stack;
 
 public class ConnectionActivity extends AppCompatActivity {
     private String host_addr;
-    private final File download_dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    private final File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     private String current = "";
 
     @Override
@@ -56,13 +57,24 @@ public class ConnectionActivity extends AppCompatActivity {
         new AsyncCopy().execute(e.getText().toString());
     }
 
-    private static String get_file_name(String str)
+    private static String getFileName(String str)
     {
         int i = str.lastIndexOf('\\');
         if (i == -1)
             return str;
         else
             return str.substring(i+1);
+    }
+
+    private static String parentPath(String str)
+    {
+        return str.substring(0, str.lastIndexOf('\\'));
+    }
+
+    private static String differencePath(String subFile, String originalRequest)
+    {
+        int i = originalRequest.length();
+        return parentPath(subFile).substring(i);
     }
 
     private class AsyncLs extends AsyncTask<String, Void, String>
@@ -138,7 +150,6 @@ public class ConnectionActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... args)
         {
-            byte[] response = new byte[512];
             String result;
             InputStream in;
 
@@ -152,7 +163,8 @@ public class ConnectionActivity extends AppCompatActivity {
                 if (!current.equals(getString(R.string.default_dir))) {
                     out.print("cd " + current);
                     out.flush();
-                    in.read(response, 0, 250);
+                    for (int i = 0; i < 12; ++i)
+                        in.read();
                 }
 
                 out.print(args[0]);
@@ -161,20 +173,48 @@ public class ConnectionActivity extends AppCompatActivity {
                 String r = "";
                 for (int i = 0; i < 6; ++i)
                     r += (char)in.read();
+
                 if (r.equals("tr now"))
                 {
+                    singleCopy(in, args[0]);
                     result = "Finished";
-                    File f = new File(download_dir, get_file_name(args[0]));
-                    OutputStream f_out = new FileOutputStream(f);
-                    int n = in.read(response, 0, 512);
-
-                    while (n != -1)
-                    {
-                        f_out.write(response, 0, n);
-                        n = in.read(response, 0, 512);
-                    }
-                    f_out.close();
                 }
+
+                else if (r.equals("trfnow"))
+                {
+                    File createdDir = new File(downloadDir, getFileName(args[0]));
+                    Stack<String> files = new Stack<>();
+
+                    setupFileList(in, files);
+                    createdDir.mkdir();
+                    in.close();
+                    out.close();
+                    connection.close();
+
+                    while (!files.empty())
+                    {
+                        connection = new Socket();
+                        connection.connect(new InetSocketAddress(host_addr, 9462), 3000);
+
+                        out = new PrintWriter(new OutputStreamWriter(connection.getOutputStream()));
+                        in = connection.getInputStream();
+
+                        String subFile = files.pop();
+                        out.print(subFile);
+                        out.flush();
+                        for (int i = 0; i < 6; ++i)
+                            in.read();
+                        processSubFile(subFile, in, args[0], createdDir);
+
+
+                        in.close();
+                        out.close();
+                        connection.close();
+                    }
+
+                    result = "Finished";
+                }
+
                 else
                     result = r;
 
@@ -196,6 +236,83 @@ public class ConnectionActivity extends AppCompatActivity {
             super.onPostExecute(result);
             TextView t = findViewById(R.id.results);
             t.setText(result);
+        }
+
+        private void singleCopy(InputStream in, String filename)
+        {
+            try {
+                byte[] response = new byte[512];
+                File f = new File(downloadDir, getFileName(filename));
+                OutputStream f_out = new FileOutputStream(f);
+                int n = in.read(response, 0, 512);
+
+                while (n != -1) {
+                    f_out.write(response, 0, n);
+                    n = in.read(response, 0, 512);
+                }
+                f_out.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        private void singleCopy(InputStream in, String filename, File parent)
+        {
+            try {
+                byte[] response = new byte[512];
+                File f = new File(parent, getFileName(filename));
+                OutputStream f_out = new FileOutputStream(f);
+                int n = in.read(response, 0, 512);
+
+                while (n != -1) {
+                    f_out.write(response, 0, n);
+                    n = in.read(response, 0, 512);
+                }
+                f_out.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        private void setupFileList(InputStream in, Stack<String> files)
+        {
+            try
+            {
+                String m = "";
+                char x = (char)in.read();
+                while (x != '!')
+                {
+                    if (x == ';')
+                    {
+                        files.push(m);
+                        System.out.println(m);
+                        m = "";
+                    }
+                    else
+                        m += x;
+                    x = (char) in.read();
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void processSubFile(String subFile, InputStream in, String originalRequest, File createdDir)
+        {
+            String difference = differencePath(subFile, originalRequest);
+
+            if (difference.equals(""))
+                singleCopy(in, getFileName(subFile), createdDir);
+            else {
+                File parent = new File(createdDir, difference);
+                parent.mkdirs();
+                singleCopy(in, getFileName(subFile), parent);
+            }
         }
     }
 }

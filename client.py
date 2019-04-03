@@ -30,9 +30,18 @@ def copyFile(fileName: str, connection):
     f.close()
     print("Done Receiving")
 
+def trfCommand(connection):
+    r = ""
+    while "!" not in r:
+        r = connection.recv(16384).decode()
+        print(r)
+
 def validateRequest(response: str, wantedFile: str, connection):
     if response == "tr now":
-        copyFile(adjustFileName(wantedFile), connection)        
+        copyFile(adjustFileName(wantedFile), connection)
+
+    elif response == "trfnow":
+        trfCommand(connection)
 
     elif response == "ls inc":
         response = connection.recv(16384).decode()
@@ -54,7 +63,7 @@ def validateRequest(response: str, wantedFile: str, connection):
 
 def checkResponse(response: str, connection):
     if containsDone(response):
-        print(response[:-4])
+        print(response[:-5])
         request = input("% ")
         connection.send(request.encode())
         validateRequest(connection.recv(16384).decode(), request, connection)

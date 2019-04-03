@@ -42,8 +42,18 @@ def lsCommand(path: Path, c):
         c.send((item+'\n').encode())
     c.send("!!!!".encode())
 
+def trfCommand(request: str, c):
+    total_list = pathFunctions.recursive_list(Path(request))
+    for item in total_list:
+        string_item = str(item) + ';'
+        c.send(string_item.encode())
+    c.send("!".encode())
+
 def validateRequest(request: str, c, path: Path):
-    if os.path.isfile(request):
+    if request == "":
+        pass
+    
+    elif os.path.isfile(request):
         c.send("tr now".encode())
         copyFile(c, request)
 
@@ -52,12 +62,12 @@ def validateRequest(request: str, c, path: Path):
         copyFile(c, pathFunctions.adjustPathString(str(path), request))
 
     elif os.path.isdir(request):
-        c.send("Transfering your folder now".encode())
-        #blahblahblah
+        c.send("trfnow".encode())
+        trfCommand(request, c)
 
     elif os.path.isdir(pathFunctions.adjustPathString(str(path), request)):
-        c.send("Transfering your folder now".encode())
-        #blahblahblah
+        c.send("trfnow".encode())
+        trfCommand(pathFunctions.adjustPathString(str(path), request), c)
 
     elif request == "ls":
         print("ls handled")
